@@ -116,7 +116,7 @@
         <repository>
             <uniqueVersion>false</uniqueVersion>
             <id>sourceforge.net</id>
-            <url>svn:https://os890@svn.code.sf.net/p/m2-ds-jsf-addon/code/</url>
+            <url>svn:https://os890@svn.code.sf.net/p/m2-ds-jsf-addon/code/ m2-ds-jsf-addon-code</url>
         </repository>
     </distributionManagement>
 </project>
