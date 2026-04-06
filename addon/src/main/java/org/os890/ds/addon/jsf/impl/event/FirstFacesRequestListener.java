@@ -16,33 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.os890.ds.addon.jsf.impl.event;
 
 import org.apache.deltaspike.core.api.config.ConfigResolver;
-import org.apache.deltaspike.core.api.lifecycle.Initialized;
 import org.apache.deltaspike.core.spi.activation.Deactivatable;
 import org.apache.deltaspike.core.util.ClassUtils;
 import org.os890.ds.addon.jsf.api.event.FirstFacesRequestEvent;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import java.util.logging.Logger;
 
+/**
+ * Listens for the first JSF request and fires a one-time CDI event.
+ *
+ * <p>Allows use of a customizable lazy startup event or a customizable
+ * and portable startup event as an alternative to
+ * {@code @Singleton + @Startup + @PostConstruct}.</p>
+ *
+ * <p>The listener can be deactivated via the DeltaSpike
+ * {@link org.apache.deltaspike.core.spi.activation.ClassDeactivator} mechanism.</p>
+ */
 //allows to use e.g. a customizable lazy startup-event
 //or a customizable and >portable< startup-event as an alternative to @Singleton + @Startup + @PostConstruct
 @ApplicationScoped
 public class FirstFacesRequestListener implements Deactivatable {
-    private final static Logger LOG = Logger.getLogger(FirstFacesRequestListener.class.getName());
+
+    private static final Logger LOG = Logger.getLogger(FirstFacesRequestListener.class.getName());
 
     @Inject
     private BeanManager beanManager;
 
     private boolean eventFired = false;
 
-    protected void onBeforeFacesRequest(@Observes @Initialized FacesContext facesContext) {
+    /**
+     * Observes JSF request initialization events and fires the
+     * first-faces-request event exactly once.
+     *
+     * @param facesContext the initialized faces context
+     */
+    protected void onBeforeFacesRequest(
+            @Observes @Initialized(RequestScoped.class) FacesContext facesContext) {
         if (this.eventFired) {
             return;
         }
@@ -59,7 +79,7 @@ public class FirstFacesRequestListener implements Deactivatable {
 
         Object eventInstance = ClassUtils.tryToInstantiateClassForName(configuredEventClassName);
 
-        this.beanManager.fireEvent(eventInstance);
+        this.beanManager.getEvent().fire(eventInstance);
         LOG.info(configuredEventClassName + " fired as first-faces-request event");
         this.eventFired = true;
     }

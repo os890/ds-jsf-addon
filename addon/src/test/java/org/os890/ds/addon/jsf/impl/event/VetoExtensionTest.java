@@ -17,15 +17,20 @@
  * under the License.
  */
 
-package org.os890.ds.addon.jsf.api.event;
+package org.os890.ds.addon.jsf.impl.event;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * CDI event fired exactly once during the first JSF request.
- *
- * <p>Observers of this event can perform one-time initialization
- * that depends on JSF being fully available. The concrete event
- * class can be overridden via the DeltaSpike configuration property
- * {@code first-faces-request_event-class}.</p>
+ * Tests for {@link VetoExtension}.
  */
-public class FirstFacesRequestEvent {
+class VetoExtensionTest {
+
+    @Test
+    void extensionCanBeInstantiated() {
+        VetoExtension extension = new VetoExtension();
+        assertNotNull(extension);
+    }
 }
